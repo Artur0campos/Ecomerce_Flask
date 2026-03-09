@@ -1,4 +1,6 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS
+from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -6,6 +8,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ecommerce.db'
 
 
 db = SQLAlchemy(app)
+CORS(app)
+
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False, unique=True)
+    password = db.Column(db.String(12), nullable=False)
 
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -18,6 +26,16 @@ class Product(db.Model):
 @app.route('/')
 def hello():
     return 'helo world!'
+
+
+@app.route('/login', methods=["POST"])
+def login():
+    data = request.json
+    user = User.query.filter_by(name=data.get('name')).first()
+    if user:
+        if data.get('password') == user.password:
+            return jsonify({"mensagem": "Logged in  successfully"})
+    return jsonify({"mensagem":"Logged in fail"},401)
 
 @app.route('/api/products/add', methods=["POST"])
 def add_product():
@@ -78,7 +96,7 @@ def get_products():
     products = Product.query.all()
     product_list = []
     for product in products:
-        product_data = {
+        product_data = { 
         "id" : product.id,
         "name" : product.name,
         "preco" : product.preco,
@@ -86,6 +104,9 @@ def get_products():
         }
         product_list.append(product_data)
     return jsonify(product_list)
+
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
