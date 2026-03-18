@@ -35,4 +35,3 @@ Embora o projeto original seguisse uma estrutura linear, apliquei uma refatoraç
 1. Clone o repositório:
    ```bash
    git clone [https://github.com/arturcampos100/nome-do-projeto.git](https://github.com/arturcampos100/nome-do-projeto.git)
->>>>>>> master
